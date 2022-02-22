@@ -3,6 +3,7 @@ def create_bar_chart_plotly(data, x, y, color
                             , pattern_shape= None
                             , text=None 
                             , showlegend = True, showxaxis= True, showyaxis = True
+                            , output_file = None
                            ):
     """Bar chart using plotly
     
@@ -23,6 +24,13 @@ def create_bar_chart_plotly(data, x, y, color
     showlegend: specify whether the have the legend visible or not
     showxaxis: specify whether the have the x axis visible or not
     showyaxis: specify whether the have the y axis visible or not
+    
+    output_file:
+        1. 'png' static supposedly better quality
+        2. 'jpeg' static
+        3. 'html' interactive but large file size
+        4. None. Default no output
+
     """
     import plotly.express as px
 
@@ -45,6 +53,20 @@ def create_bar_chart_plotly(data, x, y, color
     ##################################################
 
     fig.show()  
+
+    #export images, refer to https://plotly.com/python/static-image-export/ for static image export options and https://plotly.com/python/interactive-html-export/ for interactive image export options
+    import os
+    if not os.path.exists("images"):
+        os.mkdir("images")
+    if output_file == 'png':
+        fig.write_image("images/barchart_png.png")
+    elif output_file == 'jpeg':
+        fig.write_image("images/barchart_jpeg.jpeg")
+    elif output_file == 'html':
+        fig.write_html("images/barchart_html.html")
+    ###################################################################################################################################################################################################################
+
+
     
     
     
