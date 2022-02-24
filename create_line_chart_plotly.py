@@ -1,5 +1,7 @@
 def create_line_chart_plotly(data, x, y, title = 'Line chart',  label_renames = {}, text= None, symbol = None, color = None, markers=True 
-                             , y_dashed = None, y_h = None, y_hb = None , x_v = None, x_vb = None, yaxfmt = None, output_file = None):
+                             , y_dashed = None, y_h = None, y_hb = None , x_v = None, x_vb = None
+                             , xtick0 = None, xdtick = None, xaxismonth = False, ytick0 = None, ydtick = None , yaxfmt = None
+                             , output_file = None):
     """Plot line chart using plotly express
     
     prerequsites: DataFrame of all required data
@@ -33,6 +35,15 @@ def create_line_chart_plotly(data, x, y, title = 'Line chart',  label_renames = 
             2. 'jpeg' static
             3. 'html' interactive but large file size
             4. None. Default no output
+        xtick0: first x tick. Defaults to None
+        xdtick: x ticks. Defaults to None
+        ytick0: first y tick. Defaults to None
+        ydtick: y tick. Defaults to None
+        xaxismonth: is the x axis a month column. If yes will format as time by months. Defaults to False
+            
+    Updates 
+    
+    25/2 - added 4 arguments xtick0, xdtick, ytick0, ydtick for configuring the formatting of the x and y axis. made x axis by default 'category' type
             
     
     """
@@ -82,6 +93,15 @@ def create_line_chart_plotly(data, x, y, title = 'Line chart',  label_renames = 
     # options on y axis format: https://www.tutorialspoint.com/plotly/plotly_format_axis_and_ticks.htm
     if yaxfmt != None:
         fig.update_yaxes(tickformat=yaxfmt)
+        
+    # https://plotly.com/python/categorical-axes/
+#     fig.update_xaxes(type= 'category')# make x axis by default category
+
+    fig.update_xaxes(tick0 = xtick0, dtick = xdtick) 
+    fig.update_yaxes(tick0 = ytick0, dtick = ydtick)
+    if xaxismonth == True:
+        fig.update_xaxes(dtick="M1", tickformat="%b\n%Y")    
+    
     fig.show()
     
     
@@ -97,15 +117,19 @@ def create_line_chart_plotly(data, x, y, title = 'Line chart',  label_renames = 
         fig.write_html("images/linechart_html.html")
     ###################################################################################################################################################################################################################
 
+    
+    
+##### example 1 ##################    ###############    ###############    ###############    ###############    ###############    ###############    ###############    ###############    ###############    
+    
 # help(create_line_chart_plotly)
-# load sample data for testing
-data = px.data.gapminder().query("continent == 'Oceania'")
-data.loc[data['year']> 1987, 'Pre/Post 1987'] = 'Post'
-data.loc[data['year']<= 1987, 'Pre/Post 1987'] = 'Pre'
+# # load sample data for testing
+# data = px.data.gapminder().query("continent == 'Oceania'")
+# data.loc[data['year']> 1987, 'Pre/Post 1987'] = 'Post'
+# data.loc[data['year']<= 1987, 'Pre/Post 1987'] = 'Pre'
 # data
 
 
-# create_line_chart_plotly(data = data, x = 'year', y = 'lifeExp', color = 'country', markers = True, symbol = 'country', text = 'lifeExp', title = 'Line graph' )
+# create_line_chart_plotly(data = data, x = 'year', y = 'lifeExp', color = 'country', markers = True, symbol = 'country', text = 'lifeExp', title = 'Line graph', x_v = (1982, 'Hi') )
 # create_line_chart_plotly(data = data, x = 'year', y = 'lifeExp', color = 'country', symbol = 'country', text = 'lifeExp', title = 'Line graph' )    
 # create_line_chart_plotly(data = data, x = 'year', y = 'lifeExp', symbol = 'country', text = 'lifeExp', title = 'Line graph' )    
 # create_line_chart_plotly(data = data, x = 'year', y = 'lifeExp', text = 'lifeExp', title = 'Line graph' )   
@@ -115,20 +139,23 @@ data.loc[data['year']<= 1987, 'Pre/Post 1987'] = 'Pre'
 # create_line_chart_plotly(data = data, x = 'year', y = 'lifeExp', color = 'country', y_dashed = ['Australia'], y_h = (75, 'Example benchmark') )  # add y horizontal line
 # create_line_chart_plotly(data = data, x = 'year', y = 'lifeExp', color = 'country', y_dashed = ['Australia'], y_h = (75, 'Example benchmark'), x_hb = ((1990,2000), 'Example focus period') )  # add x bar 
 # create_line_chart_plotly(data = data, x = 'year', y = 'lifeExp', color = 'country', y_dashed = ['Australia'], y_h = (75, 'Example benchmark'), x_vb = ((1990,2000), 'Example focus period'), symbol = 'country', text = 'lifeExp' )  # add symbol and text
-
+# 
 # create_line_chart_plotly(data = data, x = 'year', y = 'lifeExp', color = 'country', y_dashed = ['Australia'], y_h = (75, 'Example y_h'), y_hb = ((70, 72), 'Low'), x_v = (1980, 'Example x_v')
 #                          , x_vb = ((1990,2000), 'Example x_hb'), symbol = 'country', text = 'lifeExp', output_file= 'png')  # add symbol and text
 
 
-
+##### example 2 ##################    ###############    ###############    ###############    ###############    ###############    ###############    ###############    ###############    ###############    
 #illustrating PCP view, 4 columns required
-data = pd.DataFrame([[100, 'CY', '06. June', 'Australia'], [99, 'CY', '07. July', 'Australia'], [102, 'CY', '08. August', 'Australia']
-                     , [105, 'LY', '06. June', 'Australia'], [103, 'LY', '07. July', 'Australia'], [95, 'LY', '08. August', 'Australia']
-                    , [62, 'CY', '06. June', 'NZ'], [76, 'CY', '07. July', 'NZ'], [80, 'CY', '08. August', 'NZ']
-                     , [52, 'LY', '06. June', 'NZ'], [66, 'LY', '07. July', 'NZ'], [72, 'LY', '08. August', 'NZ']
-                    ], columns = ['Y', 'Symbol', 'X', 'Color'])
-print(data)
+# data = pd.DataFrame([[100, 'CY', '06. June', 'Australia'], [99, 'CY', '07. July', 'Australia'], [102, 'CY', '08. August', 'Australia']
+#                      , [105, 'LY', '06. June', 'Australia'], [103, 'LY', '07. July', 'Australia'], [95, 'LY', '08. August', 'Australia']
+#                     , [62, 'CY', '06. June', 'NZ'], [76, 'CY', '07. July', 'NZ'], [80, 'CY', '08. August', 'NZ']
+#                      , [52, 'LY', '06. June', 'NZ'], [66, 'LY', '07. July', 'NZ'], [72, 'LY', '08. August', 'NZ']
+#                     ], columns = ['Y', 'Symbol', 'X', 'Color'])
+# print(data)
 
-# ideas for PCP view 
-create_line_chart_plotly(data = data, x = 'X', y = 'Y', color = 'Color', y_dashed = ['Australia, LY', 'NZ, LY']
-                         ,symbol = 'Symbol', text = 'Y', output_file= 'png')  # add symbol and text
+# # ideas for PCP view 
+# create_line_chart_plotly(data = data, x = 'X', y = 'Y', color = 'Color', y_dashed = ['Australia, LY', 'NZ, LY']
+#                          ,symbol = 'Symbol', text = 'Y'#, x_v = ('07. July', 'Test')
+#                          , xtick0 = None, xdtick = None, ytick0 = None, ydtick = None , yaxfmt = None
+#                              , output_file = 'png')
+
