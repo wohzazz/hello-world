@@ -21,7 +21,7 @@ def read_data(Category):
 # comparison = 'LY'
 # frequency = 'Daily'
 
-def prep_data_for_comparison(data, metric, period, comparison, frequency=None):
+def prep_data_for_comparison(data, metric, period, comparison, frequency=None, metric_type = None):
     """
     Prepare data for period on period 
     
@@ -31,22 +31,37 @@ def prep_data_for_comparison(data, metric, period, comparison, frequency=None):
     period: date column in df
     comparison: specify the comparison period. should correspond with the column name in df
     frequency: e.g. Daily. this will be hardcoded into the final table. Defaults to None
+    metric_type: e.g. percentage, integer, dollar. This will help with building scalable visuals
 
-    An example of the required data format:
+
     ################################################################################################################################################
+    An example of the required data format:
+
             def read_data(Category):
-            import pandas as pd
-            url = 'https://github.com/wohzazz/Datasets/blob/main/Orders_Trended.csv?raw=true' # link need to be 'raw'. Refer to https://stackoverflow.com/questions/55240330/how-to-read-csv-file-from-github-using-pandas for more info
-            df = pd.read_csv(url, parse_dates = ['Date', 'LY_Date', 'LW_Date'], dayfirst=True)    
-            df = df[df['Category'] == Category]
-            
-            return df
-            
+                import pandas as pd
+                url = 'https://github.com/wohzazz/Datasets/blob/main/Orders_Trended.csv?raw=true' # link need to be 'raw'. Refer to https://stackoverflow.com/questions/55240330/how-to-read-csv-file-from-github-using-pandas for more info
+                df = pd.read_csv(url, parse_dates = ['Date', 'LY_Date', 'LW_Date'], dayfirst=True)    
+                df = df[df['Category'] == Category]
+                
+                return df
+                
             df = read_data(Category = 'Phones')
-            df
+            # df
+
+            df = prep_data(
+            data = read_data(Category = 'Computers')
+            ,metric = 'NbrOrders'
+            ,period = 'Date'
+            ,comparison = 'LY'
+            #     ,frequency = 'Daily'
+            )
+            df.loc[:, 'Category'] = 'Computers'
+            display(df)
+
     ################################################################################################################################################
     """
-    
+    # libraries 
+    import pandas as pd
     # calculated variables based on input parameters
     agg_dict = {metric: 'sum'}
     left_on = [comparison+'_'+period]
@@ -78,7 +93,7 @@ def prep_data_for_comparison(data, metric, period, comparison, frequency=None):
     df = df.rename({period: 'Period', comparison+'_'+period: 'Comp Period', metric: 'Metric Value', metric+'_'+comparison: 'Metric Value Comp Period'}, axis=1)
     df.loc[:, 'Frequency'] = frequency
     df.loc[:, 'Metric'] = metric
-    df.loc[:, 'Metric Type'] = 'Percentage'
+    df.loc[:, 'Metric Type'] = metric_type
      
     return df
 
@@ -92,12 +107,12 @@ df = prep_data_for_comparison(
 df.loc[:, 'Category'] = 'Phones'
 display(df)
 
-# df = prep_data(
-#     data = read_data(Category = 'Computers')
-#     ,metric = 'NbrOrders'
-#     ,period = 'Date'
-#     ,comparison = 'LY'
-# #     ,frequency = 'Daily'
-# )
-# df.loc[:, 'Category'] = 'Computers'
-# display(df)
+df = prep_data(
+    data = read_data(Category = 'Computers')
+    ,metric = 'NbrOrders'
+    ,period = 'Date'
+    ,comparison = 'LY'
+#     ,frequency = 'Daily'
+)
+df.loc[:, 'Category'] = 'Computers'
+display(df)
